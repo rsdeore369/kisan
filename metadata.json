@@ -1,0 +1,6 @@
+{
+  "name": "Kisan Growth",
+  "description": "Direct agricultural marketplace connecting farmers and buyers for transparent farm-to-table trade",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

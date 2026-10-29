@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kisan Growth - Direct Farm-to-Table Marketplace & AI Advisor</title>
+  <link rel="icon" href="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=64&q=80">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d'
+            },
+            earth: {
+              500: '#854d0e',
+              600: '#713f12'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 3s infinite;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
+
+  <!-- TOP NAVBAR -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        
+        <!-- Logo -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('marketplace')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white shadow-md">
+            <i data-lucide="sprout" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <span class="text-xl font-bold bg-gradient-to-r from-brand-800 to-brand-600 bg-clip-text text-transparent">Kisan Growth</span>
+            <span class="text-xs block text-gray-500 font-medium tracking-wide">Krishi Setu Direct Trade</span>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <button onclick="switchView('marketplace')" id="nav-marketplace" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 flex items-center space-x-2 transition">
+            <i data-lucide="store" class="w-4 h-4"></i>
+            <span>Marketplace</span>
+          </button>
+          <button onclick="switchView('farmer')" id="nav-farmer" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-brand-700 hover:bg-gray-100 flex items-center space-x-2 transition">
+            <i data-lucide="tractor" class="w-4 h-4"></i>
+            <span>Farmer Hub</span>
+          </button>
+          <button onclick="switchView('orders')" id="nav-orders" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-brand-700 hover:bg-gray-100 flex items-center space-x-2 transition">
+            <i data-lucide="package-check" class="w-4 h-4"></i>
+            <span>Orders</span>
+          </button>
+          <button onclick="switchView('advisor')" id="nav-advisor" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-brand-700 hover:bg-gray-100 flex items-center space-x-2 transition">
+            <i data-lucide="bot" class="w-4 h-4"></i>
+            <span>Krishi AI</span>
+          </button>
+        </nav>
+
+        <!-- Right Side Actions -->
+        <div class="flex items-center space-x-3">
+          <!-- Role Pill -->
+          <div class="hidden sm:flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200 text-xs">
+            <button id="role-buyer-btn" onclick="setRole('BUYER')" class="px-3 py-1.5 rounded-lg font-semibold bg-white text-gray-800 shadow-sm transition">Buyer</button>
+            <button id="role-farmer-btn" onclick="setRole('FARMER')" class="px-3 py-1.5 rounded-lg font-semibold text-gray-500 hover:text-gray-800 transition">Farmer</button>
+          </div>
+
+          <!-- Download APK Button -->
+          <a href="/download-apk" download="KisanGrowth.apk" class="inline-flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl shadow-md transition transform active:scale-95">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Download</span> APK
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- WEATHER & ADVISORY STRIP -->
+  <section class="bg-gradient-to-r from-amber-500/10 via-brand-50 to-emerald-500/10 border-b border-brand-100 py-3 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs sm:text-sm gap-2">
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-1.5 font-bold text-amber-700 bg-amber-100/80 px-2.5 py-1 rounded-lg">
+          <i data-lucide="sun" class="w-4 h-4 text-amber-600"></i>
+          <span id="weather-temp">28°C Sunny</span>
+        </div>
+        <span class="text-gray-500 hidden sm:inline">•</span>
+        <span class="text-gray-600 hidden sm:inline" id="weather-humidity">Humidity: 58%</span>
+        <span class="text-gray-500 hidden sm:inline">•</span>
+        <span class="text-gray-600 hidden sm:inline" id="weather-rain">Rain Risk: 10%</span>
+      </div>
+      <div class="flex items-center space-x-2 text-brand-900 font-medium text-center md:text-left">
+        <i data-lucide="sparkles" class="w-4 h-4 text-brand-600 shrink-0"></i>
+        <span id="weather-advisory" class="truncate max-w-xl">Optimal weather for harvesting and grain drying. Ensure morning irrigation.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ================= VIEW 1: MARKETPLACE (BUYER VIEW) ================= -->
+    <div id="view-marketplace" class="space-y-6">
+      
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-900 via-brand-800 to-emerald-900 text-white p-6 sm:p-10 shadow-xl">
+        <div class="relative z-10 max-w-2xl space-y-3">
+          <span class="inline-block bg-brand-500/20 text-brand-200 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-brand-400/30">Direct Farm-To-Table Trade</span>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Fair Prices for Farmers, Fresh Produce for You</h1>
+          <p class="text-brand-100 text-sm sm:text-base">Connecting verified agricultural producers directly with wholesalers, retailers, and conscious consumers across India without middleman cuts.</p>
+          <div class="pt-2 flex flex-wrap gap-3">
+            <button onclick="scrollToCrops()" class="bg-brand-500 hover:bg-brand-400 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-lg transition">Browse Crops</button>
+            <button onclick="openAddCropModal()" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-5 py-2.5 rounded-xl border border-white/20 transition">Sell Your Harvest</button>
+            <button onclick="switchView('advisor')" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-5 py-2.5 rounded-xl border border-white/20 transition flex items-center space-x-2">
+              <i data-lucide="bot" class="w-4 h-4"></i>
+              <span>Ask AI Advisor</span>
+            </button>
+          </div>
+        </div>
+        <div class="absolute -right-10 -bottom-10 opacity-15 pointer-events-none">
+          <i data-lucide="wheat" class="w-96 h-96 text-white"></i>
+        </div>
+      </div>
+
+      <!-- Search & Filters -->
+      <div id="crops-section" class="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div class="relative w-full sm:w-96">
+            <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="search-input" oninput="renderCrops()" placeholder="Search crops, produce, or location..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+          </div>
+          <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+            <button onclick="openAddCropModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm flex items-center justify-center space-x-2 transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>List Crop for Sale</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Pills -->
+        <div class="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none" id="category-pills">
+          <button onclick="selectCategory('All')" class="cat-pill active px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-brand-600 text-white shadow-sm shrink-0">All Produce</button>
+          <button onclick="selectCategory('Grains')" class="cat-pill px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 shrink-0">Grains</button>
+          <button onclick="selectCategory('Vegetables')" class="cat-pill px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 shrink-0">Vegetables</button>
+          <button onclick="selectCategory('Fruits')" class="cat-pill px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 shrink-0">Fruits</button>
+          <button onclick="selectCategory('Spices')" class="cat-pill px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 shrink-0">Spices</button>
+          <button onclick="selectCategory('Organic')" class="cat-pill px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 shrink-0">Organic</button>
+          <button onclick="selectCategory('Dairy')" class="cat-pill px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 shrink-0">Dairy</button>
+        </div>
+      </div>
+
+      <!-- Crops Grid -->
+      <div id="crops-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- ================= VIEW 2: FARMER DASHBOARD ================= -->
+    <div id="view-farmer" class="space-y-6 hidden">
+      <!-- Farmer Header Card -->
+      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-2xl">
+            <i data-lucide="tractor" class="w-8 h-8"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">Farmer Dashboard • Rajesh Kumar</h2>
+            <p class="text-sm text-gray-500">Verified Producer • Karnal, Haryana (Kisan ID: KS-9821)</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button onclick="openAddCropModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-md flex items-center space-x-2 transition">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Add New Harvest</span>
+          </button>
+          <button onclick="switchView('advisor')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm px-4 py-2.5 rounded-xl flex items-center space-x-2 transition">
+            <i data-lucide="bot" class="w-4 h-4 text-brand-600"></i>
+            <span>Agronomy Advisory</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Farmer KPI Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active Harvest Listings</span>
+          <div class="text-3xl font-extrabold text-gray-900 mt-2" id="stat-crops-count">6</div>
+          <span class="text-xs text-brand-600 font-medium flex items-center mt-1">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-1"></i> Live on Kisan Marketplace
+          </span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Received Orders</span>
+          <div class="text-3xl font-extrabold text-gray-900 mt-2" id="stat-orders-count">2</div>
+          <span class="text-xs text-blue-600 font-medium flex items-center mt-1">
+            <i data-lucide="clock" class="w-3.5 h-3.5 mr-1"></i> Real-time buyer requests
+          </span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Estimated Revenue</span>
+          <div class="text-3xl font-extrabold text-emerald-600 mt-2" id="stat-revenue">₹10,650</div>
+          <span class="text-xs text-emerald-700 font-medium flex items-center mt-1">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1"></i> 0% middleman commission
+          </span>
+        </div>
+      </div>
+
+      <!-- Farmer Listings -->
+      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900">My Listed Crops</h3>
+          <span class="text-xs text-gray-500">Live prices and stock levels</span>
+        </div>
+        <div id="farmer-crops-list" class="divide-y divide-gray-100">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Farmer Orders Management -->
+      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900">Manage Incoming Buyer Orders</h3>
+          <span class="text-xs text-gray-500">Update status to notify buyers</span>
+        </div>
+        <div id="farmer-orders-list" class="space-y-3">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 3: ORDERS ================= -->
+    <div id="view-orders" class="space-y-6 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Orders & Invoices</h2>
+          <p class="text-sm text-gray-500">Track order lifecycle and farm delivery status</p>
+        </div>
+        <button onclick="loadOrders()" class="text-sm text-brand-700 font-semibold hover:underline flex items-center space-x-1">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
+      <div id="all-orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- ================= VIEW 4: KRISHI AI ADVISOR ================= -->
+    <div id="view-advisor" class="space-y-6 hidden">
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-[700px]">
+        
+        <!-- Advisor Header -->
+        <div class="bg-gradient-to-r from-brand-800 to-brand-700 text-white p-4 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <i data-lucide="brain-circuit" class="w-6 h-6 text-white"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg">Krishi AI Agricultural Advisor</h3>
+              <p class="text-xs text-brand-200">Expert Agronomy, Pest Management & Mandi Price Intelligence</p>
+            </div>
+          </div>
+          <span class="bg-emerald-500/30 text-emerald-200 text-xs px-2.5 py-1 rounded-full font-semibold border border-emerald-400/40 flex items-center space-x-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Online</span>
+          </span>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center space-x-2 overflow-x-auto text-xs scrollbar-none">
+          <span class="text-gray-400 font-medium shrink-0">Ask about:</span>
+          <button onclick="sendQuickPrompt('What are the latest mandi price trends for Basmati rice and Onions?')" class="bg-white border border-gray-200 hover:border-brand-500 text-gray-700 px-3 py-1.5 rounded-lg shrink-0 transition">📈 Mandi Prices</button>
+          <button onclick="sendQuickPrompt('How do I treat leaf spot and fungal pests using organic methods?')" class="bg-white border border-gray-200 hover:border-brand-500 text-gray-700 px-3 py-1.5 rounded-lg shrink-0 transition">🐛 Pest Control</button>
+          <button onclick="sendQuickPrompt('What is the best irrigation and weather advisory for current 28°C sunny conditions?')" class="bg-white border border-gray-200 hover:border-brand-500 text-gray-700 px-3 py-1.5 rounded-lg shrink-0 transition">☀️ Weather Advisory</button>
+          <button onclick="sendQuickPrompt('How to prepare natural Jeevamrut bio-fertilizer for Rabi crops?')" class="bg-white border border-gray-200 hover:border-brand-500 text-gray-700 px-3 py-1.5 rounded-lg shrink-0 transition">🌱 Organic Fertilizers</button>
+        </div>
+
+        <!-- Chat History -->
+        <div id="chat-messages" class="flex-grow p-4 overflow-y-auto space-y-4 bg-gray-50/50">
+          <!-- Initial AI greeting -->
+          <div class="flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center shrink-0">
+              <i data-lucide="bot" class="w-4 h-4"></i>
+            </div>
+            <div class="bg-white border border-gray-200 p-4 rounded-2xl rounded-tl-none shadow-sm max-w-lg text-sm leading-relaxed">
+              <p class="font-semibold text-brand-800 text-xs mb-1">Krishi AI Advisor</p>
+              Namaste! I am your AI Agronomy and Market Advisor. Ask me anything about crop diseases, pest mitigation, current mandi prices, or organic soil preparation. How can I assist your farm today?
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="p-3 bg-white border-t border-gray-200">
+          <form onsubmit="handleChatSubmit(event)" class="flex items-center space-x-2">
+            <input type="text" id="chat-input" placeholder="Ask about crop health, prices, disease remedies..." class="flex-grow px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+            <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold p-2.5 rounded-xl shadow-md transition">
+              <i data-lucide="send" class="w-5 h-5"></i>
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= MODAL: PRODUCT DETAILS & BUY ================= -->
+  <div id="buy-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
+      <button onclick="closeBuyModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+      
+      <div class="space-y-4" id="modal-product-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ADD CROP ================= -->
+  <div id="add-crop-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
+      <button onclick="closeAddCropModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <h3 class="text-xl font-bold text-gray-900 mb-1">List Harvest for Sale</h3>
+      <p class="text-xs text-gray-500 mb-4">Provide accurate details to attract verified wholesale and retail buyers.</p>
+
+      <form onsubmit="handleAddCropSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Crop / Produce Title</label>
+          <input type="text" id="crop-title" required placeholder="e.g. Organic Sharbati Wheat" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Category</label>
+            <select id="crop-category" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+              <option value="Grains">Grains</option>
+              <option value="Vegetables">Vegetables</option>
+              <option value="Fruits">Fruits</option>
+              <option value="Spices">Spices</option>
+              <option value="Dairy">Dairy</option>
+              <option value="Organic">Organic</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Unit of Measure</label>
+            <select id="crop-unit" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+              <option value="kg">kg</option>
+              <option value="quintal">quintal</option>
+              <option value="crate">crate</option>
+              <option value="litre">litre</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Price per Unit (₹)</label>
+            <input type="number" id="crop-price" required step="0.5" placeholder="e.g. 45" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Available Quantity</label>
+            <input type="number" id="crop-quantity" required step="1" placeholder="e.g. 1500" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Farmer / Producer Name</label>
+            <input type="text" id="crop-farmer-name" value="Rajesh Kumar" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Contact Phone</label>
+            <input type="text" id="crop-farmer-phone" value="+91 98765 43210" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Farm Location (City, State)</label>
+          <input type="text" id="crop-location" value="Karnal, Haryana" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Image URL (Optional)</label>
+          <input type="url" id="crop-image" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Crop Description & Harvest Notes</label>
+          <textarea id="crop-desc" rows="2" placeholder="Naturally grown, cleaned and sorted..." class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500"></textarea>
+        </div>
+
+        <div class="flex items-center space-x-2 pt-1">
+          <input type="checkbox" id="crop-organic" class="w-4 h-4 text-brand-600 rounded focus:ring-brand-500">
+          <label for="crop-organic" class="text-xs font-semibold text-gray-700">Certified Organic Produce</label>
+        </div>
+
+        <div class="pt-3">
+          <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl shadow-md transition">Publish Listing</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-gray-200 mt-12 py-6 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="sprout" class="w-4 h-4 text-brand-600"></i>
+        <span class="font-bold text-gray-700">Kisan Growth (Krishi Setu)</span>
+        <span>•</span>
+        <span>Empowering Indian Farmers & Transparent Agriculture</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="/download-apk" class="text-brand-700 font-semibold hover:underline flex items-center space-x-1">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+          <span>Download Android App</span>
+        </a>
+        <span>•</span>
+        <span class="text-gray-400">Deployed on Render Cloud</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Logic -->
+  <script src="/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
+
